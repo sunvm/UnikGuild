@@ -2,24 +2,26 @@ name: UnikGuild
 version: 1.0.0
 main: me.smokietrue.unikguild.Main
 api-version: '1.21'
-author: smokietrue
-description: Плагин для создания гильдий через золотой меч
+authors: [smokietrue]
+description: Плагин для управления гильдиями
+
 commands:
-  guilds:
-    description: Админ-команды гильдий
-    usage: /<command> [list|delete|give]
-    permission: unikguild.admin
   g:
-    description: Команды гильдии
-    usage: /<command> [accept|deny|members|kick|leave|info]
+    description: Основные команды гильдии
+    usage: /g <accept|deny|info|kick|leave|disband|chat|role|assign>
+  guilds:
+    description: Административные команды гильдий
+    usage: /guilds <list|delete|give>
+    permission: unikguild.admin
+  guildcolor:
+    description: Выбор цвета для гильдии
+    usage: /guildcolor <цвет>
+    permission: unikguild.use
+
 permissions:
   unikguild.admin:
-    description: Админ-права гильдий
+    description: Административные права гильдий
     default: op
   unikguild.use:
-    description: Использование гильдий
+    description: Использование основных функций гильдий
     default: true
-  guildcolor: 
-    description: Изменить цвет гильдии
-    usage: /guildcolor <цвет>
-    permission: unikguild.use 

@@ -18,6 +18,54 @@ public class ItemManager {
         this.plugin = plugin;
     }
     
+    // Метод для создания меча при выдаче командой /guilds give
+    public ItemStack createEmptyGuildSword() {
+        ItemStack sword = new ItemStack(Material.GOLDEN_SWORD);
+        ItemMeta meta = sword.getItemMeta();
+        
+        if (meta == null) return sword;
+        
+        meta.setDisplayName(ChatColor.GOLD + "Меч гильдии");
+        meta.setLore(Arrays.asList(
+            ChatColor.YELLOW + "Использований: 15/15",
+            "",
+            ChatColor.GRAY + "ПКМ: Начать создание гильдии",
+            ChatColor.GRAY + "ЛКМ по игроку: Пригласить в гильдию"
+        ));
+        
+        meta.setUnbreakable(true);
+        meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+        
+        Enchantment unbreaking = Enchantment.getByKey(NamespacedKey.minecraft("unbreaking"));
+        if (unbreaking != null) {
+            meta.addEnchant(unbreaking, 3, true);
+        }
+        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        sword.setItemMeta(meta);
+        
+        return sword;
+    }
+    
+    // Метод для обновления меча после создания гильдии
+    public ItemStack updateSwordForGuild(ItemStack sword, String guildName, String color, int uses) {
+        if (sword.getType() != Material.GOLDEN_SWORD) return sword;
+        
+        ItemMeta meta = sword.getItemMeta();
+        if (meta == null) return sword;
+        
+        ChatColor chatColor = ChatColor.valueOf(color);
+        meta.setDisplayName(chatColor + "Меч гильдии " + guildName);
+        meta.setLore(Arrays.asList(
+            chatColor + "Использований: " + uses + "/15",
+            "",
+            chatColor + "ПКМ: Информация о гильдии",
+            chatColor + "ЛКМ по игроку: Приглашить в гильдию"
+        ));
+        
+        sword.setItemMeta(meta);
+        return sword;
+    }
+    
     public ItemStack createGuildSword(String guildName, String color, int uses) {
         ItemStack sword = new ItemStack(Material.GOLDEN_SWORD);
         ItemMeta meta = sword.getItemMeta();
@@ -29,8 +77,8 @@ public class ItemManager {
         meta.setLore(Arrays.asList(
             chatColor + "Использований: " + uses + "/15",
             "",
-            chatColor + "ПКМ: Создать гильдию",
-            chatColor + "ЛКМ по игроку: Пригласить"
+            chatColor + "ПКМ: Информация о гильдии",
+            chatColor + "ЛКМ по игроку: Приглашить в гильдию"
         ));
         
         meta.setUnbreakable(true);
