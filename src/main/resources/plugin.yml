@@ -19,3 +19,7 @@ permissions:
   unikguild.use:
     description: Использование гильдий
     default: true
+  guildcolor: 
+    description: Изменить цвет гильдии
+    usage: /guildcolor <цвет>
+    permission: unikguild.use 
