@@ -268,6 +268,38 @@ public class GuildManager {
         }
     }
 
+    public void createNameTag(Player player, String petName) {
+        String guildName = playerGuilds.get(player.getUniqueId());
+        if (guildName == null) {
+            player.sendMessage(ChatColor.RED + "Вы не состоите в гильдии.");
+            return;
+        }
+        
+        Guild guild = guilds.get(guildName);
+        if (guild == null) {
+            player.sendMessage(ChatColor.RED + "Ваша гильдия не найдена.");
+            return;
+        }
+        
+        ItemStack itemInHand = player.getInventory().getItemInMainHand();
+        if (itemInHand.getType() != Material.NAME_TAG) {
+            player.sendMessage(ChatColor.RED + "Вы должны держать бирку (Name Tag) в руке.");
+            return;
+        }
+        
+        if (petName.length() > 32) {
+            player.sendMessage(ChatColor.RED + "Имя питомца не может быть длиннее 32 символов.");
+            return;
+        }
+        
+        ChatColor guildColor = ChatColor.valueOf(guild.getColor());
+        ItemMeta meta = itemInHand.getItemMeta();
+        meta.setDisplayName(guildColor + petName);
+        itemInHand.setItemMeta(meta);
+        
+        player.sendMessage(ChatColor.GREEN + "Бирка переименована! Теперь она окрашена в цвет вашей гильдии.");
+    }
+
     public void disbandGuild(Player player) {
         String guildName = playerGuilds.get(player.getUniqueId());
         if (guildName == null) {
@@ -342,13 +374,29 @@ public class GuildManager {
     }
 
     public Guild getGuild(String name) { return guilds.get(name); }
+    
     public Guild getGuildByPlayer(UUID playerId) {
         String guildName = playerGuilds.get(playerId);
         return guildName != null ? guilds.get(guildName) : null;
     }
     
+    public Guild getGuildByFounderName(String founderName) {
+        for (Guild guild : guilds.values()) {
+            String founder = Bukkit.getOfflinePlayer(guild.getFounder()).getName();
+            if (founder != null && founder.equalsIgnoreCase(founderName)) {
+                return guild;
+            }
+        }
+        return null;
+    }
+    
     public List<String> getGuildNames() {
         return new ArrayList<>(guilds.keySet());
+    }
+    
+    // Добавлен метод для получения всех гильдий
+    public Map<String, Guild> getGuilds() {
+        return new HashMap<>(guilds);
     }
     
     public void kickMember(Player kicker, String targetName) {
@@ -403,15 +451,17 @@ public class GuildManager {
         sender.sendMessage(ChatColor.YELLOW + "Список гильдий:");
         for (Guild guild : guilds.values()) {
             ChatColor color = ChatColor.valueOf(guild.getColor());
+            String founderName = Bukkit.getOfflinePlayer(guild.getFounder()).getName();
             sender.sendMessage(color + " • " + guild.getName() + ChatColor.GRAY + 
-                    " (" + guild.getMembers().size() + "/" + guild.getMaxMembers() + ")");
+                    " (" + guild.getMembers().size() + "/" + guild.getMaxMembers() + ") " +
+                    ChatColor.DARK_GRAY + "Основатель: " + founderName);
         }
         sender.sendMessage(ChatColor.GOLD + "══════════════════════════════════");
     }
     
-    public void deleteGuild(CommandSender sender, String guildName) {
+    public void deleteGuildByName(CommandSender sender, String guildName) {
         if (!guilds.containsKey(guildName)) {
-            sender.sendMessage(ChatColor.RED + "Гильдия не найдена.");
+            sender.sendMessage(ChatColor.RED + "Гильдия '" + guildName + "' не найдена.");
             return;
         }
         Guild guild = guilds.get(guildName);
@@ -419,7 +469,7 @@ public class GuildManager {
             playerGuilds.remove(memberId);
             Player member = Bukkit.getPlayer(memberId);
             if (member != null && member.isOnline()) {
-                member.sendMessage(ChatColor.RED + "Ваша гильдия была удалена администратором.");
+                member.sendMessage(ChatColor.RED + "Ваша гильдия '" + guildName + "' была удалена администратором.");
                 clearPlayerDisplay(member);
                 removeGuildItems(member);
             }
@@ -427,5 +477,27 @@ public class GuildManager {
         guilds.remove(guildName);
         saveData();
         sender.sendMessage(ChatColor.GREEN + "Гильдия '" + guildName + "' удалена.");
+    }
+    
+    public void deleteGuildByFounder(CommandSender sender, String founderName) {
+        Guild guild = getGuildByFounderName(founderName);
+        if (guild == null) {
+            sender.sendMessage(ChatColor.RED + "Гильдия основателя '" + founderName + "' не найдена.");
+            return;
+        }
+        
+        String guildName = guild.getName();
+        for (UUID memberId : guild.getMembers()) {
+            playerGuilds.remove(memberId);
+            Player member = Bukkit.getPlayer(memberId);
+            if (member != null && member.isOnline()) {
+                member.sendMessage(ChatColor.RED + "Ваша гильдия '" + guildName + "' была удалена администратором (по основателю " + founderName + ").");
+                clearPlayerDisplay(member);
+                removeGuildItems(member);
+            }
+        }
+        guilds.remove(guildName);
+        saveData();
+        sender.sendMessage(ChatColor.GREEN + "Гильдия '" + guildName + "' основателя '" + founderName + "' удалена.");
     }
 }

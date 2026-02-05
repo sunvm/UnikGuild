@@ -1,5 +1,6 @@
 me\smokietrue\unikguild\Config.class
 me\smokietrue\unikguild\Main.class
+me\smokietrue\unikguild\UnikGuildAPI.class
 me\smokietrue\unikguild\Guild.class
 me\smokietrue\unikguild\GuildManager.class
 me\smokietrue\unikguild\ItemManager.class

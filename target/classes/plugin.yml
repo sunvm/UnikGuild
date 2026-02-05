@@ -1,5 +1,5 @@
 name: UnikGuild
-version: 1.0.0
+version: 1.0.1
 main: me.smokietrue.unikguild.Main
 api-version: '1.21'
 authors: [smokietrue]
@@ -8,7 +8,7 @@ description: Плагин для управления гильдиями
 commands:
   g:
     description: Основные команды гильдии
-    usage: /g <accept|deny|info|kick|leave|disband|chat|role|assign>
+    usage: /g <accept|deny|info|kick|leave|disband|chat|role|assign|nametag>
   guilds:
     description: Административные команды гильдий
     usage: /guilds <list|delete|give>
